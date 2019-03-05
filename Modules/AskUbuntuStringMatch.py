@@ -64,7 +64,7 @@ def loadAStrs(data, ansArr):
      #print (Unanswered)
      return aDict;
 
-def compare(inString, QDict):
+def seqMatch(inString, QDict):
 
   # Iterate over Question Strings
   maxRatio = 0;
@@ -83,3 +83,41 @@ def compare(inString, QDict):
       maxIdx = QDict[key][1];
 
   return maxRatio, maxQ, maxIdx;
+
+def wordMatch(inString, QDict):
+
+    # Tokenize input String
+    words = inString.split();
+
+    # make all lowercase
+    # Fixme! - Once dataset is cleaned revise this tokenization
+    words = [x.lower() for x in words];
+
+    #print(words);
+    count = len(words);
+
+    # Iterate over Question Strings
+    maxMatches = 0;
+    maxIdx = 0;
+    maxQ = "";
+
+    for key in QDict:
+      # print(QDict[key])
+
+      # Tokenize each question string
+      curToken = QDict[key][0].split();
+
+      matches = {x for x in words if x in curToken};
+
+      # Save the max
+      if(len(matches) > maxMatches):
+        maxMatches = len(matches);
+        #print("Max matches is :", maxMatches);
+        maxQ = QDict[key][0];
+        maxIdx = QDict[key][1];
+
+    #print("Input word count: ", count);
+    #print("Matched word count: ", maxMatches);
+    maxRatio = maxMatches/count;
+
+    return maxRatio, maxQ, maxIdx;

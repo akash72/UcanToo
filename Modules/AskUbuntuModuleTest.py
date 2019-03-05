@@ -45,16 +45,15 @@ def main(argv):
 
     #Pass question into compare
     #Should get index, matched question, and ratio values back
-    maxRatio, maxQ, maxIdx = StringMatch.compare(inStr, QDict);
-
+    wordRatio, wordQ, wordIdx = StringMatch.wordMatch(inStr, QDict);
     #Get answer based on index
-    Ans = ADict[maxIdx];
+    wordAns = ADict[wordIdx];
 
     #Print everything out
-    print("Question Asked: ",inStr);
-    print("Closest Question Found: ",maxQ);
-    print("Ratio: ", maxRatio*100);
-    print("Answer: ", Ans);
+    print("\nQuestion Asked: ",inStr);
+    print("Ratio: ", wordRatio*100);
+    print("Closest Question Found (Word): ",wordQ);
+    print("Answer: ", wordAns);
 
 if __name__ == "__main__":
     #Argument one should be relative path to datafile (../Data/Posts.xml)
