@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import AskUbuntuStringMatch as StringMatch
+import AskUbuntuStringIdfMatch as IdfMatch
 import sys, os
 import _pickle as pickle
 import gzip
@@ -45,7 +46,12 @@ def main(argv):
 
     #Pass question into compare
     #Should get index, matched question, and ratio values back
-    wordRatio, wordQ, wordIdx = StringMatch.wordMatch(inStr, QDict);
+    # wordMatch
+    ##wordRatio, wordQ, wordIdx = StringMatch.wordMatch(inStr, QDict);
+
+    QIdfDict = IdfMatch.genQIdfData(QDict);
+    wordRatio, wordQ, wordIdx = IdfMatch.wordMatchIdf(inStr, QDict, QIdfDict);
+
     #Get answer based on index
     wordAns = ADict[wordIdx];
 
