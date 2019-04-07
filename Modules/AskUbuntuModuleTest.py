@@ -9,34 +9,34 @@ from xml.etree import ElementTree as ET
 
 def main(argv):
 
-    datafile = sys.argv[1];
+    datafile = sys.argv[1]
 
     fileDir = os.path.dirname(os.path.realpath('__file__'))
     # Check for the Q/A dict stored off
-    qfilename = os.path.join(fileDir, '../Data/ubuntuQDict.txt.gz');
-    afilename = os.path.join(fileDir, '../Data/ubuntuADict.txt.gz');
-    dfilename = os.path.join(fileDir, datafile);
+    qfilename = os.path.join(fileDir, '../Data/ubuntuQDict.txt.gz')
+    afilename = os.path.join(fileDir, '../Data/ubuntuADict.txt.gz')
+    dfilename = os.path.join(fileDir, datafile)
 
     if (os.path.exists(qfilename) == True and
        os.path.exists(afilename) == True):
         print("Question/Answer Dicts found! Loading...")
         # Load our Question dictionary
-        QDict = pickle.load(gzip.open(qfilename,'rb'));
+        QDict = pickle.load(gzip.open(qfilename,'rb'))
         #QDict = pickle.load(open(qfilename, "rb"));
         # Load our Answer dictionary
-        ADict = pickle.load(gzip.open(afilename, 'rb'));
+        ADict = pickle.load(gzip.open(afilename, 'rb'))
     else:
         print("Question/Answer Dicts NOT found! Creating...")
         #Open the dataFile
-        data = ET.parse(dfilename);
+        data = ET.parse(dfilename)
         #Get the questions
-        QDict, ansArr = StringMatch.loadQStrs(data);
+        QDict, ansArr = StringMatch.loadQStrs(data)
         # Save the questions
         with gzip.open(qfilename, 'wb') as f:
             f.write(pickle.dumps(QDict))
 
         #Get the answers
-        ADict = StringMatch.loadAStrs(data, ansArr);
+        ADict = StringMatch.loadAStrs(data, ansArr)
         # Save the answers
         with gzip.open(afilename, 'wb') as f:
                 f.write(pickle.dumps(ADict))
@@ -48,7 +48,6 @@ def main(argv):
     #Should get index, matched question, and ratio values back
     # wordMatch
     ##wordRatio, wordQ, wordIdx = StringMatch.wordMatch(inStr, QDict);
-
     QIdfDict = IdfMatch.genQIdfData(QDict);
     wordRatio, wordQ, wordIdx = IdfMatch.wordMatchIdf(inStr, QDict, QIdfDict);
 
