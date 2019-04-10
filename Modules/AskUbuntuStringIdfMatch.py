@@ -54,14 +54,15 @@ def wordMatchIdf(inString, QDict, QIdfDict):
     #print(words);
     incount = len(words);
 
-    # FIXME! - Compute total IDF for input words
+    # Keep top 3 matching questions
+    maxMatchVal = 0;
+    minMatchVal = [0, 0, 0];
+    maxMatches = [0, 0, 0];
+    maxRatio = [0, 0, 0];
+    maxIdxs = [0, 0, 0];
+    maxQs = {};
 
     # Iterate over Question Strings
-    maxMatchVal = 0;
-    maxMatches = 0;
-    maxIdx = 0;
-    maxQ = "";
-
     for key in QDict:
       # print(QDict[key])
 
@@ -80,19 +81,53 @@ def wordMatchIdf(inString, QDict, QIdfDict):
           matchVal += QIdfDict[word];
           count += 1;
 
-      # Save the max
-      if(matchVal > maxMatchVal):
-        maxMatchVal = matchVal;
-        maxMatches = count;
-        #print("Max match val is :", maxMatchVal);
-        #print("Max match count is :", maxMatches);
-        maxQ = QDict[key][0];
-        maxIdx = QDict[key][1];
+      # See if this is top 3
+      if(matchVal > min(minMatchVal)):
+        #print("new matchVal is :", matchVal);
+        # Get index
+        idx = minMatchVal.index(min(minMatchVal));
+        minMatchVal[idx] = matchVal;
+        maxMatches[idx] = count;
+        maxIdxs[idx] = QDict[key][1];
+        maxQs[idx] = QDict[key][0];
+        maxRatio[idx] = maxMatches[idx]/incount;
 
+
+    # Sort the 3 values here
+    maxIdx = minMatchVal.index(max(minMatchVal));
+    minIdx = minMatchVal.index(min(minMatchVal));
+
+    # Check if all the same value
+    if maxIdx == minIdx:
+        maxIdx = 0;
+        minIdx = 2;
+
+    # Find the medium value
+    for i in range(3):
+        if i != maxIdx and i != minIdx:
+            medIdx = i;
+
+    #print("maxIdx: ",maxIdx);
+    #print("minIdx: ",minIdx);
+    #print("medIdx: ",medIdx);
+
+    maxQuestions = {};
+    maxRatios = [0, 0, 0];
+    maxAIdxs = [0, 0, 0];
+    maxQuestions[0] = maxQs[maxIdx];
+    maxQuestions[1] = maxQs[medIdx];
+    maxQuestions[2] = maxQs[minIdx];
+
+    maxRatios[0] = maxRatio[maxIdx];
+    maxRatios[1] = maxRatio[medIdx];
+    maxRatios[2] = maxRatio[minIdx];
+
+    maxAIdxs[0] = maxIdxs[maxIdx];
+    maxAIdxs[1] = maxIdxs[medIdx];
+    maxAIdxs[2] = maxIdxs[minIdx];
 
     #print("Input word count: ", count);
     #print("Matched word count: ", maxMatches);
     # FIXME! - Could use IDF ratio as better ratio
-    maxRatio = maxMatches/incount;
 
-    return maxRatio, maxQ, maxIdx;
+    return maxRatios, maxQuestions, maxIdxs;
