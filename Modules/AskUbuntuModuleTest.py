@@ -9,7 +9,7 @@ from xml.etree import ElementTree as ET
 
 def main(argv):
 
-    datafile = sys.argv[1];
+    datafile = sys.argv[1]
 
     fileDir = os.path.dirname(os.path.realpath('__file__'))
     qfilename = os.path.join(fileDir, '../Data/ubuntuQDict.txt.gz');
@@ -25,9 +25,9 @@ def main(argv):
     else:
         print("Question Dict NOT found! Creating...")
         #Open the dataFile
-        data = ET.parse(dfilename);
+        data = ET.parse(dfilename)
         #Get the questions
-        QDict, ansArr = StringMatch.loadQStrs(data);
+        QDict, ansArr = StringMatch.loadQStrs(data)
         # Save the questions
         with gzip.open(qfilename, 'wb') as f:
             f.write(pickle.dumps(QDict))
@@ -43,7 +43,7 @@ def main(argv):
         #Get the questions
         QDict, ansArr = StringMatch.loadQStrs(data);
         #Get the answers
-        ADict = StringMatch.loadAStrs(data, ansArr);
+        ADict = StringMatch.loadAStrs(data, ansArr)
         # Save the answers
         with gzip.open(afilename, 'wb') as f:
                 f.write(pickle.dumps(ADict))
