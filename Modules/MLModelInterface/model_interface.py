@@ -7,10 +7,13 @@ import pickle
 import argparse
 import pandas as pd
 import keras
+import string
 from keras.models import model_from_json
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from pathlib import Path
+from nltk.stem import WordNetLemmatizer
+
 
 def openEmbeddingFile():
 
@@ -151,6 +154,17 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, tokenizer):
     #6. Return the best response (unlemmatized)
     return best_resp[2];
 
+
+def lemmatizeInput(str):
+    lemmatizer = WordNetLemmatizer() 
+
+    str.translate(str.maketrans('', '', string.punctuation))
+    words = str.split()
+    lemmatizedString = ""
+    for word in words:
+        lemmatizedString += lemmatizer.lemmatize(word) + " "
+    return lemmatizedString[:-1]
+
 # Main entry point
 if __name__ == "__main__":
 
@@ -182,7 +196,7 @@ if __name__ == "__main__":
 
     # Get input string from user
     inStr = input("Ask an Ubuntu Question: ");
-
+    
     # Magic!
-    response = getResponse(inStr, embeddings, QADict, ucantoo_model, tokenizer);
+    response = getResponse(lemmatizeInput(inStr), embeddings, QADict, ucantoo_model, tokenizer);
 
