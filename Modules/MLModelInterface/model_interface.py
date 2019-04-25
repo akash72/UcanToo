@@ -109,27 +109,14 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, tokenizer):
     # 5. Call the predict function on the model
     # 6. Take the 'best' and return the unlemmatized version of response
 
-    ## FIXME! - Need to lemmatize intput string
-    #1. Lemmatize the string here
-
     #1. Convert input string to GloVe vector
     print("Generating input string embedding...");
     in_emb = generateStringEmbedding(input_string, embeddings);
 
-    # FIXME! - Update to get 10 best
     #2. Find the 10 best embedding matches and save the responses
     max_val = 100000;
     respSeq = []
-
-    # for entry in QADict:
-    #     # Diff of the two embeddings
-    #     val = np.absolute(np.sum(np.subtract(in_emb, QADict[entry][0])));
-    #     if val < max_val:
-    #         print("Val: ",val);
-    #         max_val = val;
-    #         #3. Save tokenized sequence for this response
-    #         respSeq = (QADict[entry][1]);
-
+    respSen = []
     values = []
     dictValue = {}
     for entry in QADict:
@@ -146,7 +133,6 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, tokenizer):
                 lastVal = values[9]
 
                 # Deleting the key with the max value
-
                 del dictValue[max(dictValue.items(), key=lambda k: k[1])[0]]
 
                 dictValue[entry] = val
@@ -158,21 +144,18 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, tokenizer):
     
     for key in dictValue:
         respSeq.append(QADict[key][1])
+        respSen.append(QADict[key][2])
 
-    print("Response seq: ", len(respSeq))
-
-    #print("Best val: ", max_val);
 
     #4. Tokenize the input/response strings
     inputStr = []
-    respStr = []
-    inputStr.append(input_string);
-    respStr.append(respSeq);
+    for w in range(10):
+        inputStr.append(input_string);
     tokenizer.fit_on_texts(inputStr);
     inputStr = tokenizer.texts_to_sequences(inputStr);
     inputStr = pad_sequences(inputStr, maxlen=160);
     inputStr = np.asarray(inputStr);
-    respStr = np.asarray(respStr);
+    respStr = np.asarray(respSeq);
 
     print("Input string sequence is:\n", inputStr);
     print("Response string sequence is:\n", respStr);
@@ -180,11 +163,13 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, tokenizer):
     #5. Send input string and responses to predict
     pred = ucantoo_model.predict([inputStr, respStr]);
 
-    #FIXME! - Find the highest prediction value
     print("Prediction is:\n", pred);
-    print("Returning response:\n", best_resp[2]);
+
     #6. Return the best response (unlemmatized)
-    return best_resp[2];
+    maxIdx = np.argmax(pred);
+
+    print("Top index is :\n", maxIdx);
+    return pred[maxIdx], respSen[maxIdx];
 
 
 def lemmatizeInput(str):
@@ -230,5 +215,7 @@ if __name__ == "__main__":
     inStr = input("Ask an Ubuntu Question: ");
     
     # Magic!
-    response = getResponse(lemmatizeInput(inStr), embeddings, QADict, ucantoo_model, tokenizer);
+    val, response = getResponse(lemmatizeInput(inStr), embeddings, QADict, ucantoo_model, tokenizer);
 
+    print("Top response confidence is: ", val);
+    print("Top response:\n", response);
