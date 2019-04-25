@@ -131,7 +131,6 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, tokenizer):
     #         respSeq = (QADict[entry][1]);
 
     values = []
-    tempValues = []
     dictValue = {}
     for entry in QADict:
         # Diff of the two embeddings
@@ -154,7 +153,6 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, tokenizer):
                 values = values[:-1]
                 values.append(val)
     
-    tempValues.sort()
     print("values: ", values)
     print("Dict values: ", dictValue)
     
