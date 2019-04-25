@@ -8,6 +8,8 @@ import argparse
 import pandas as pd
 import keras
 import string
+import itertools
+import operator
 from keras.models import model_from_json
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
@@ -119,15 +121,47 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, tokenizer):
     max_val = 100000;
     respSeq = []
 
+    # for entry in QADict:
+    #     # Diff of the two embeddings
+    #     val = np.absolute(np.sum(np.subtract(in_emb, QADict[entry][0])));
+    #     if val < max_val:
+    #         print("Val: ",val);
+    #         max_val = val;
+    #         #3. Save tokenized sequence for this response
+    #         respSeq = (QADict[entry][1]);
+
+    values = []
+    tempValues = []
+    dictValue = {}
     for entry in QADict:
         # Diff of the two embeddings
         val = np.absolute(np.sum(np.subtract(in_emb, QADict[entry][0])));
-        if val < max_val:
-            print("Val: ",val);
-            max_val = val;
-            #3. Save tokenized sequence for this response
-            respSeq = (QADict[entry][1]);
 
+        if len(values) < 10:
+            values.append(val)
+            dictValue[entry] = val
+        else:
+            values.sort()
+            if val < values[9]:
+
+                lastVal = values[9]
+
+                # Deleting the key with the max value
+
+                del dictValue[max(dictValue.items(), key=lambda k: k[1])[0]]
+
+                dictValue[entry] = val
+                values = values[:-1]
+                values.append(val)
+    
+    tempValues.sort()
+    print("values: ", values)
+    print("Dict values: ", dictValue)
+    
+    for key in dictValue:
+        respSeq.append(QADict[key][1])
+
+    print("Response seq: ", len(respSeq))
 
     #print("Best val: ", max_val);
 
