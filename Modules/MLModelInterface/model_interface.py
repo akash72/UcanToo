@@ -10,6 +10,7 @@ import keras
 import string
 import itertools
 import operator
+import math
 from keras.models import model_from_json
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
@@ -128,13 +129,32 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, graph, tokenize
     #2. Find the 10 best embedding matches and save the responses
     max_val = 100000
     respSeq = []
+
+    def euclidean_dist(x, y):
+        return sqrt(sum(pow(a - b, 2) for a, b in zip(x, y)))
+
+    def nth_root(value, n_root):
+        root_value = 1 / float(n_root)
+        return round(Decimal(value) ** Decimal(root_value), 3)
+
+    def minkowski_dist(x, y, p_value):
+        return nth_root(sum(pow(abs(a - b), p_value) for a, b in zip(x, y)), p_value)
+
     respSen = []
     values = []
     dictValue = {}
     for entry in QADict:
+        
+        # Euclidean Distance between the two embeddings
+        #val= euclidean_distance(in_emb,QADict[entry][0])
+        #minkowski Distance between the two embeddings
+        # 3 is the order of the norm of the difference
+        #val= minkowski_dist(in_emb,QADict[entry][0],3)
+        # Cosine similarity between two vectors
+        #val = 1 - spatial.distance.cosine(in_emb,QADict[entry][0] )
         # Diff of the two embeddings
-        val = np.absolute(np.sum(np.subtract(in_emb, QADict[entry][0])))
-
+        val = np.absolute(np.sum(np.subtract(in_emb, QADict[entry][0])));
+        
         if len(values) < 10:
             values.append(val)
             dictValue[entry] = val
@@ -183,4 +203,5 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, graph, tokenize
         maxIdx = np.argmax(pred)
 
         print("Top index is :\n", maxIdx)
-        return pred[maxIdx], respSen[maxIdx]
+        print("Resp: ", respSeq[maxIdx])
+        return pred[maxIdx], respSen[maxIdx].replace("__eou__", '\n')

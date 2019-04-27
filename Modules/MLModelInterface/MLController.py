@@ -48,7 +48,7 @@ def getAnswer():
     val, response = modelInterface.getResponse(question, embeddings, QADict, ucantoo_model, graph, tokenizer)
     return jsonify({
                     "question": question, 
-                    "answers": response, 
+                    "answers":  response, 
                     })
 
 if __name__ == '__main__':
