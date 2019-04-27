@@ -121,7 +121,7 @@ def nth_root(value, n_root):
     return round(Decimal(value) ** Decimal(root_value), 3)
 
 def minkowski_dist(x, y, p_value):
-    return nth_root(math.sum(pow(abs(a - b), p_value) for a, b in zip(x, y)), p_value)
+    return nth_root(sum(pow(abs(a - b), p_value) for a, b in zip(x, y)), p_value)
    
 def getResponse(input_string, embeddings, QADict, ucantoo_model, graph, tokenizer):
 
@@ -149,12 +149,12 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, graph, tokenize
     for entry in QADict:
         
         # Euclidean Distance between the two embeddings
-        val = euclidean_dist(in_emb,QADict[entry][0])
+        #val = euclidean_dist(in_emb,QADict[entry][0])
         #minkowski Distance between the two embeddings
         # 3 is the order of the norm of the difference
         #val = minkowski_dist(in_emb,QADict[entry][0],3)
         # Cosine similarity between two vectors
-        #val = 1 - spatial.distance.cosine(in_emb,QADict[entry][0])
+        val = 1 - spatial.distance.cosine(in_emb,QADict[entry][0])
         # Diff of the two embeddings
         #val = np.absolute(np.sum(np.subtract(in_emb, QADict[entry][0])));
         
@@ -199,12 +199,16 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, graph, tokenize
     
     with graph.as_default():
         pred = ucantoo_model.predict([inputStr, respStr])
-        print(pred)
         #print("Prediction is:\n", pred);
 
         #6. Return the best response (unlemmatized)
         maxIdx = np.argmax(pred)
 
         print("Top index is :\n", maxIdx)
-        print("Resp: ", respSeq[maxIdx])
-        return pred[maxIdx], respSen[maxIdx].replace("__eou__", '\n')
+        print("Resp: ", respSen[maxIdx])
+        print("Pred: ", pred[maxIdx])
+
+        if pred[maxIdx][0] >= 0.5:
+            return pred[maxIdx], respSen[maxIdx].replace("__eou__", '\n')
+        else: 
+            return pred[maxIdx], "I am not able to understand what you're saying. Can you please rephrase your question?"
