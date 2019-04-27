@@ -11,6 +11,8 @@ import string
 import itertools
 import operator
 import math
+
+from scipy import spatial
 from keras.models import model_from_json
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
