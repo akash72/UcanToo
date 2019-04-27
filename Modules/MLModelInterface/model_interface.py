@@ -15,12 +15,13 @@ from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from pathlib import Path
 from nltk.stem import WordNetLemmatizer
+import tensorflow as tf
 
 
 def openEmbeddingFile():
 
     fileDir = os.path.dirname(os.path.realpath('__file__'))
-    embedding_file = os.path.join(fileDir, 'Data/glove.840B.300d.txt');
+    embedding_file = os.path.join(fileDir, 'Data/glove.840B.300d.txt')
 
     #Check if the embeddings file is already there
     embedFile = os.path.join(fileDir, 'Data/embeddings.pkl')
@@ -51,7 +52,7 @@ def openEmbeddingFile():
 
 def generateStringEmbedding(in_str, embeddings):
 
-    ctx_emb = np.zeros(300);
+    ctx_emb = np.zeros(300)
 
     # Add up the word embeddings
     for i, word in enumerate(in_str):
@@ -66,7 +67,7 @@ def generateQADict(embeddings):
 
     # Check if Dict exists
     fileDir = os.path.dirname(os.path.realpath('__file__'))
-    embedFile = os.path.join(fileDir, 'Data/QADict.pkl');
+    embedFile = os.path.join(fileDir, 'Data/QADict.pkl')
     if os.path.isfile(embedFile):
       print("QADict pickle found! Loading...")
       # file exists
@@ -83,7 +84,7 @@ def generateQADict(embeddings):
 
     for i in range(rows):
         if (i % 1000) == 0:
-            print("Process rows: ",i);
+            print("Process rows: ",i)
         # Save off the positive contexts
         if (train.loc[i].Label == 1):
             #Generate embedding for Context
@@ -94,12 +95,21 @@ def generateQADict(embeddings):
             # [2] The unlemmatized response string (to be returned to the user)
             QADict[i] = (embedding, tr_rsp[i], train.loc[i].Utterance)
 
-    print("\nSaving training embeddings...");
+    print("\nSaving training embeddings...")
     pickle.dump(QADict, open("Data/QADict.pkl", 'wb'), protocol=-1)
     return QADict
 
+def lemmatizeInput(str):
+    lemmatizer = WordNetLemmatizer() 
+
+    str.translate(str.maketrans('', '', string.punctuation))
+    words = str.split()
+    lemmatizedString = ""
+    for word in words:
+        lemmatizedString += lemmatizer.lemmatize(word) + " "
+    return lemmatizedString[:-1]
    
-def getResponse(input_string, embeddings, QADict, ucantoo_model, tokenizer):
+def getResponse(input_string, embeddings, QADict, ucantoo_model, graph, tokenizer):
 
     # Current flow is as follows:
     # 1. Lemmatize input string and convert to a Glove vector
@@ -109,19 +119,21 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, tokenizer):
     # 5. Call the predict function on the model
     # 6. Take the 'best' and return the unlemmatized version of response
 
+    input_string = lemmatizeInput(input_string)
+
     #1. Convert input string to GloVe vector
-    print("Generating input string embedding...");
-    in_emb = generateStringEmbedding(input_string, embeddings);
+    print("Generating input string embedding...")
+    in_emb = generateStringEmbedding(input_string, embeddings)
 
     #2. Find the 10 best embedding matches and save the responses
-    max_val = 100000;
+    max_val = 100000
     respSeq = []
     respSen = []
     values = []
     dictValue = {}
     for entry in QADict:
         # Diff of the two embeddings
-        val = np.absolute(np.sum(np.subtract(in_emb, QADict[entry][0])));
+        val = np.absolute(np.sum(np.subtract(in_emb, QADict[entry][0])))
 
         if len(values) < 10:
             values.append(val)
@@ -150,72 +162,25 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, tokenizer):
     #4. Tokenize the input/response strings
     inputStr = []
     for w in range(10):
-        inputStr.append(input_string);
-    tokenizer.fit_on_texts(inputStr);
-    inputStr = tokenizer.texts_to_sequences(inputStr);
-    inputStr = pad_sequences(inputStr, maxlen=160);
-    inputStr = np.asarray(inputStr);
-    respStr = np.asarray(respSeq);
+        inputStr.append(input_string)
+    tokenizer.fit_on_texts(inputStr)
+    inputStr = tokenizer.texts_to_sequences(inputStr)
+    inputStr = pad_sequences(inputStr, maxlen=160)
+    inputStr = np.asarray(inputStr)
+    respStr = np.asarray(respSeq)
 
-    print("Input string sequence is:\n", inputStr);
-    print("Response string sequence is:\n", respStr);
-
+    print("Input string sequence is:\n", inputStr)
+    print("Response string sequence is:\n", respStr)
+    #print(ucantoo_model)
     #5. Send input string and responses to predict
-    pred = ucantoo_model.predict([inputStr, respStr]);
-
-    print("Prediction is:\n", pred);
-
-    #6. Return the best response (unlemmatized)
-    maxIdx = np.argmax(pred);
-
-    print("Top index is :\n", maxIdx);
-    return pred[maxIdx], respSen[maxIdx];
-
-
-def lemmatizeInput(str):
-    lemmatizer = WordNetLemmatizer() 
-
-    str.translate(str.maketrans('', '', string.punctuation))
-    words = str.split()
-    lemmatizedString = ""
-    for word in words:
-        lemmatizedString += lemmatizer.lemmatize(word) + " "
-    return lemmatizedString[:-1]
-
-# Main entry point
-if __name__ == "__main__":
-
-    # Load/Generate the GloVe embeddings file
-    embeddings = openEmbeddingFile();
-
-    # Load/Generate QA Dictionary file
-    QADict = generateQADict(embeddings);
-
-    # Load the ML model
-    fileDir = os.path.dirname(os.path.realpath('__file__'))
-    json_file = os.path.join(fileDir, 'Data/model.json');
-    model_json_file = open(json_file, 'r')
-    loaded_model_json = model_json_file.read()
-    model_json_file.close()
-    ucantoo_model = model_from_json(loaded_model_json)
-
-    # Load the ML model weights
-    ucantoo_model.load_weights("Data/model.h5")
-
-    print("Loaded model from disk")
- 
-    # Compile the model
-    ucantoo_model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-    # Load the tokenizer (to tokenize the input string)
-    with open('Data/tokenizer.pkl', 'rb') as handle:
-        tokenizer = pickle.load(handle)
-
-    # Get input string from user
-    inStr = input("Ask an Ubuntu Question: ");
     
-    # Magic!
-    val, response = getResponse(lemmatizeInput(inStr), embeddings, QADict, ucantoo_model, tokenizer);
+    with graph.as_default():
+        pred = ucantoo_model.predict([inputStr, respStr])
+        print(pred)
+        #print("Prediction is:\n", pred);
 
-    print("Top response confidence is: ", val);
-    print("Top response:\n", response);
+        #6. Return the best response (unlemmatized)
+        maxIdx = np.argmax(pred)
+
+        print("Top index is :\n", maxIdx)
+        return pred[maxIdx], respSen[maxIdx]
