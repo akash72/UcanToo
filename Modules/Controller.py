@@ -29,7 +29,9 @@ def setConfig():
         #QDict = pickle.load(open(qfilename, "rb"));
         # Load our Answer dictionary
         ADict = pickle.load(gzip.open(afilename, 'rb'))
-        return QDict, ADict
+        #Generate the QIdfDict
+        QIdfDict = StringMatch.genQIdfData(QDict)
+        return QDict, ADict, QIdfDict
     else:
         print("Question/Answer Dicts NOT found! Creating...")
         #Open the dataFile
@@ -45,16 +47,20 @@ def setConfig():
         # Save the answers
         with gzip.open(afilename, 'wb') as f:
                 f.write(pickle.dumps(ADict))
-        return QDict, ADict
+
+        #Generate the QIdfDict
+        QIdfDict = StringMatch.genQIdfData(QDict)
+
+        return QDict, ADict, QIdfDict
 
 
-QDict, ADict = setConfig()
+QDict, ADict, QIdfDict = setConfig()
 
 @app.route('/askubuntu/questions', methods=['POST'])
 def getAnswer():  
     startTime2 = time.time()
     question = request.json['question']
-    wordRatio, wordQ, wordIdx = IdfMatch.getAnswer(QDict, question)
+    wordRatio, wordQ, wordIdx = IdfMatch.getAnswer(QDict, question, QIdfDict)
     answers = []
     answers.append(ADict[wordIdx])
     print("Time1: ", time.time() - startTime1, "Time2", time.time() - startTime2)
