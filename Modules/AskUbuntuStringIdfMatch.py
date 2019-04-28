@@ -11,8 +11,8 @@ from flask import Flask
 # app = Flask(__name__)
 # cache.init_app(app)
 
-def getAnswer(QDict, question):
-  return wordMatchIdf(question, QDict, genQIdfData(QDict))
+def getAnswer(QDict, question, QIdfDict):
+  return wordMatchIdf(question, QDict, QIdfDict)
 
 def genQIdfData(QDict):
 
