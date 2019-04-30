@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { ScrollView } from 'react-native';
-import axios from 'axios';
 import AnswerDetail from './AnswerDetail';
 
 class Question extends Component {

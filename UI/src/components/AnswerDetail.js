@@ -4,6 +4,7 @@ import HTML from 'react-native-render-html';
 import Card from './Card';
 import CardSection from './CardSection';
 import Button from './Button';
+import { Actions } from 'react-native-router-flux';
 
 const AnswerDetail = (props) => {
     console.log(props.answer)
@@ -35,7 +36,7 @@ const AnswerDetail = (props) => {
             </CardSection>   
 
             <CardSection>
-                <Button 
+                {/* <Button 
                     onPress = {() => Alert.alert(
                         'Do not worry! Our ML model is on its way',
                         '',
@@ -45,7 +46,13 @@ const AnswerDetail = (props) => {
                         { cancelable: false }
                       )}>
                     Not happy?  
-                </Button>
+                </Button> */}
+
+                <Button 
+                    onPress = {() => Actions.ubuntuBot({question: props.question})}
+                >
+                Click to ask our Bot!
+                </Button>   
                      
             </CardSection>     
        

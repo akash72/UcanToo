@@ -54,15 +54,19 @@ QDict, ADict = setConfig()
 def getAnswer():  
     startTime2 = time.time()
     question = request.json['question']
-    wordRatio, wordQ, wordIdx = IdfMatch.getAnswer(QDict, question)
+    ratios, questions, ids = IdfMatch.getAnswer(QDict, question)
     answers = []
-    answers.append(ADict[wordIdx])
+    answers.append(ADict[ids[0]])
+    answers.append(ADict[ids[1]])
+    answers.append(ADict[ids[2]])
+
+
     print("Time1: ", time.time() - startTime1, "Time2", time.time() - startTime2)
     return jsonify({
                     "question": question, 
                     "answers": answers, 
-                    "ratio": wordRatio*10,
-                    "closestQuestion": wordQ
+                    #"ratio": wordRatio*10,
+                    #"closestQuestion": wordQ
                     })
     
 

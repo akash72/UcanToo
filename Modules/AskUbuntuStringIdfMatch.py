@@ -117,29 +117,33 @@ def wordMatchIdf(inString, QDict, QIdfDict):
     # Find the medium value
     for i in range(3):
         if i != maxIdx and i != minIdx:
-            medIdx = i;
+            medIdx = i
 
     #print("maxIdx: ",maxIdx);
     #print("minIdx: ",minIdx);
     #print("medIdx: ",medIdx);
 
-    maxQuestions = {};
-    maxRatios = [0, 0, 0];
-    maxAIdxs = [0, 0, 0];
-    maxQuestions[0] = maxQs[maxIdx];
-    maxQuestions[1] = maxQs[medIdx];
-    maxQuestions[2] = maxQs[minIdx];
+    maxQuestions = {}
+    maxRatios = [0, 0, 0]
+    maxAIdxs = [0, 0, 0]
+    maxQuestions[0] = maxQs[maxIdx]
+    maxQuestions[1] = maxQs[medIdx]
+    maxQuestions[2] = maxQs[minIdx]
 
-    maxRatios[0] = maxRatio[maxIdx];
-    maxRatios[1] = maxRatio[medIdx];
-    maxRatios[2] = maxRatio[minIdx];
+    maxRatios[0] = maxRatio[maxIdx]
+    maxRatios[1] = maxRatio[medIdx]
+    maxRatios[2] = maxRatio[minIdx]
 
-    maxAIdxs[0] = maxIdxs[maxIdx];
-    maxAIdxs[1] = maxIdxs[medIdx];
-    maxAIdxs[2] = maxIdxs[minIdx];
+    maxAIdxs[0] = maxIdxs[maxIdx]
+    maxAIdxs[1] = maxIdxs[medIdx]
+    maxAIdxs[2] = maxIdxs[minIdx]
 
     #print("Input word count: ", count);
     #print("Matched word count: ", maxMatches);
     # FIXME! - Could use IDF ratio as better ratio
+    
+    print("maxQuestions: ", maxQuestions)
+    print("maxRatios: ", maxRatios)
+    print("maxAIdxs: ", maxAIdxs)
 
-    return maxRatios, maxQuestions, maxIdxs;
+    return maxRatios, maxQuestions, maxIdxs
