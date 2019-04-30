@@ -30,7 +30,7 @@ def setConfig():
         # Load our Answer dictionary
         ADict = pickle.load(gzip.open(afilename, 'rb'))
         #Generate the QIdfDict
-        QIdfDict = StringMatch.genQIdfData(QDict)
+        QIdfDict = IdfMatch.genQIdfData(QDict)
         return QDict, ADict, QIdfDict
     else:
         print("Question/Answer Dicts NOT found! Creating...")
@@ -49,7 +49,7 @@ def setConfig():
                 f.write(pickle.dumps(ADict))
 
         #Generate the QIdfDict
-        QIdfDict = StringMatch.genQIdfData(QDict)
+        QIdfDict = IdfMatch.genQIdfData(QDict)
 
         return QDict, ADict, QIdfDict
 
@@ -60,7 +60,7 @@ QDict, ADict, QIdfDict = setConfig()
 def getAnswer():  
     startTime2 = time.time()
     question = request.json['question']
-    ratios, questions, ids = IdfMatch.getAnswer(QDict, question)
+    ratios, questions, ids = IdfMatch.getAnswer(QDict, question, QIdfDict)
     answers = []
     answers.append(ADict[ids[0]])
     answers.append(ADict[ids[1]])

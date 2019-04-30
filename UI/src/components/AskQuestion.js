@@ -10,7 +10,7 @@ import { Actions } from 'react-native-router-flux';
 
 class AskQuestion extends Component {
 
-    state = { question: '', loading: false,  answers: []};
+    state = { question: '', loading: false,  answers: [] };
 
     async onButtonPress() {
 
@@ -57,6 +57,8 @@ class AskQuestion extends Component {
                     label = "Question"
                     placeholder = "Ask your question here..."
                     editable = {false}
+                    height = { 500 }
+                    width = { 350 }
                 />
             )   
         }
@@ -67,6 +69,8 @@ class AskQuestion extends Component {
                 label = "Question"
                 placeholder = "Ask your question here..."
                 editable = {true}
+                height = { 500 }
+                width = { 350 }
             />
         )
     }

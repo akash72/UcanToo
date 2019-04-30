@@ -1,16 +1,32 @@
 import React from 'react';
 import { Text, View, TextInput } from 'react-native';
 
-const Input = ({ label, value, onChangeText, placeholder, editable }) => {
+const Input = ({ label, value, onChangeText, placeholder, editable, height, width }) => {
+    // if(this.props.label != null) {
+    //     return( 
+    //         <View style>
+    //             <Text >
+    //                 { label }
+    //             </Text>
+    //             <TextInput
+    //                 value = { value }
+    //                 onChangeText = { onChangeText }
+    //                 multiline={true}
+    //                 blurOnSubmit = {true}
+    //                 flexDirection = 'row'
+    //                 autoCorrect = {false}
+    //                 placeholder = {placeholder}
+    //                 editable = {editable}
+    //                 height = { height }
+    //                 width = { width }
+    //             />
+    //         </View>      
+    //     );
+    // }
 
-    const {inputStyle, labelStyle, containerStyle} = styles;
-    return(
+    return( 
         <View style>
-            <Text >
-                { label }
-            </Text>
             <TextInput
-                style = { {height: 500, width: 350} }
                 value = { value }
                 onChangeText = { onChangeText }
                 multiline={true}
@@ -19,8 +35,10 @@ const Input = ({ label, value, onChangeText, placeholder, editable }) => {
                 autoCorrect = {false}
                 placeholder = {placeholder}
                 editable = {editable}
+                height = { height }
+                width = { width }
             />
-        </View>
+        </View>      
     );
 };
 
@@ -32,8 +50,6 @@ const styles = {
         fontSize: 18,
         lineHeight: 23,
         flex: 2,
-        // height: 500, 
-        // width: 350
     },
     labelStyle: {
         fontSize: 18,
