@@ -154,15 +154,16 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, graph, tokenize
         # 3 is the order of the norm of the difference
         #val = minkowski_dist(in_emb,QADict[entry][0],3)
         # Cosine similarity between two vectors
-        val = 1 - spatial.distance.cosine(in_emb,QADict[entry][0])
+        #val = 1 - spatial.distance.cosine(in_emb,QADict[entry][0])
         # Diff of the two embeddings
-        #val = np.absolute(np.sum(np.subtract(in_emb, QADict[entry][0])));
-        
+        val = np.absolute(np.sum(np.subtract(in_emb, QADict[entry][0])));
+        #print("Val: ", val)
         if len(values) < 10:
             values.append(val)
             dictValue[entry] = val
         else:
             values.sort()
+            
             if val < values[9]:
 
                 lastVal = values[9]
@@ -194,6 +195,8 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, graph, tokenize
 
     print("Input string sequence is:\n", inputStr)
     print("Response string sequence is:\n", respStr)
+    print("Response string sentence is:\n", respSen)
+    
     #print(ucantoo_model)
     #5. Send input string and responses to predict
     
@@ -208,7 +211,7 @@ def getResponse(input_string, embeddings, QADict, ucantoo_model, graph, tokenize
         print("Resp: ", respSen[maxIdx])
         print("Pred: ", pred[maxIdx])
 
-        if pred[maxIdx][0] >= 0.5:
+        if pred[maxIdx][0] >= 0.60:
             return pred[maxIdx], respSen[maxIdx].replace("__eou__", '\n')
         else: 
             return pred[maxIdx], "I am not able to understand what you're saying. Can you please rephrase your question?"

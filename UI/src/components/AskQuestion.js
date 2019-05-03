@@ -25,15 +25,15 @@ class AskQuestion extends Component {
               )
         }
         else {
-            const { question, answers } = this.state;
+    
             this.setState({ loading: true });
-
             await axios.post('http://127.0.0.1:5000/askubuntu/questions', {
-                "question": question
+                "question": this.state.question
             })
             .then(response => this.setState({ answers: response.data.answers }));
+        
             this.setState({loading: false})
-            Actions.question({question: question, answers: answers});
+            Actions.question({ question: this.state.question, answers: this.state.answers });           
         }   
     }
 

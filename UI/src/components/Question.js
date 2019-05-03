@@ -17,7 +17,7 @@ class Question extends Component {
     }
 
     render() {
-        console.log(this.state);
+        console.log('Inside question: ', this.state);
         return (
             <ScrollView>
                 {this.renderAnswers()} 
